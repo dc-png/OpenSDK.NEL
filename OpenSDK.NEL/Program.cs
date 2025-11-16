@@ -277,7 +277,7 @@ static void CreateProxyInterceptor(
     StandardYggdrasil yggdrasil,
     EntityNetGameItem server,
     EntityGameCharacter character,
-    dynamic version,
+    EntityMcVersion version,
     EntityNetGameServerAddress address,
     string mods)
 {
@@ -298,6 +298,7 @@ static void CreateProxyInterceptor(
     void YggdrasilCallback(string serverId)
     {
         Log.Information("Server ID: {Certification}", serverId);
+        var pair = Md5Mapping.GetMd5FromGameVersion(version.Name);
 
         var signal = new SemaphoreSlim(0);
         _ = Task.Run(async () =>
@@ -308,8 +309,8 @@ static void CreateProxyInterceptor(
                 {
                     GameId = server.EntityId,
                     GameVersion = version.Name,
-                    BootstrapMd5 = "2A7A476411A1687A56DC6848829C1AE4",
-                    DatFileMd5 = "D285CBF97D9BA30D3C445DBF1C342634",
+                    BootstrapMd5 = pair.BootstrapMd5,
+                    DatFileMd5 = pair.DatFileMd5,
                     Mods = JsonSerializer.Deserialize<ModList>(mods)!,
                     User = new UserProfile { UserId = int.Parse(authOtp.EntityId), UserToken = authOtp.Token }
                 }, serverId);
